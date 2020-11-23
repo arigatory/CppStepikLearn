@@ -19,6 +19,24 @@ char *resize(const char *str, unsigned size, unsigned new_size)
     return res;
 }
 
+/* somebody's solution */
+char *resize2(const char *str, unsigned size, unsigned new_size)
+{
+	char *new_str = new char[new_size];
+    int min = size < new_size ? size : new_size;
+	for (int i = 0; i < min; new_str[i] = str[i], ++i);
+	delete[] str;
+	return new_str;
+}
+
+// using built-in algorithm
+char* resize3(const char* mem, unsigned size, unsigned new_size)
+{
+	char* new_mem = new char[new_size];
+	std::copy(mem, mem + std::min(size, new_size), new_mem);
+	delete[] mem;
+	return new_mem;
+}
 
 int main()
 {
