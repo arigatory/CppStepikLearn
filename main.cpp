@@ -78,8 +78,66 @@ int ** transpose(const int * const * m, unsigned rows, unsigned cols)
     return res;
 }
 
+void swap_min(int *m[], unsigned rows, unsigned cols)
+{
+    int min_row = 0;
+    int min_value = m[0][0];
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            if (m[i][j]<min_value){
+                min_value = m[i][j];
+                min_row = i;
+            }            
+        }
+    }
+    int * temp = m[0];
+    m[0] = m[min_row];
+    m[min_row] = temp;
+}
+
+void print_matrix( int *m[ ], const unsigned rows, const unsigned cols )
+{
+for ( size_t i = 0; i < rows; ++i )
+    {
+        for ( size_t j = 0; j < cols; ++j )
+            std::cout << m[ i ][ j ] << ' ';
+        std::cout << "\n";
+    }
+}
+
+void input_matrix( int *m[ ], const unsigned rows, const unsigned cols )
+{
+    for ( size_t i = 0; i < rows; i++ )
+        for ( size_t j = 0; j < cols; j++ )
+        {
+            std::cout << "Input matrix[" << i << "," << j << "]: ";
+            std::cin >> m[ i ][ j ];
+        }
+}
+
+
+
 int main()
 {
-    char * line = getline();
-    cout << line << endl;
+    unsigned rows, columns;
+    std::cout << "Input number of rows: ";
+    std::cin >> rows;
+    std::cout << "Input number of columns: ";
+    std::cin >> columns;
+    int** matrix = new int*[ rows ];
+    for ( size_t count = 0; count < rows; count++ )
+        matrix[count] = new int[ columns ];
+    input_matrix( matrix, rows, columns );
+    std::cout << "\nYour matrix is... \n\n";
+    print_matrix( matrix, rows, columns);
+    std::cout << "\nChange row with first row ... \n\n";
+    swap_min( matrix, rows, columns );
+    std::cout << "Modified matrix... \n\n";
+    print_matrix( matrix, rows, columns);
+    std::cout << "\nFree memory... \n";
+    for ( size_t count = 0; count < rows; count++ )
+        delete[ ] matrix[ count ];
+    return 0;
 }
