@@ -45,4 +45,6 @@ int main()
     delete n;
     n = new int[1000];
     delete n;
+    cout << "test\n";
+    //test
 }
