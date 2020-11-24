@@ -38,13 +38,29 @@ char* resize3(const char* mem, unsigned size, unsigned new_size)
 	return new_mem;
 }
 
+char *getline()
+{
+    int n = 10;
+    char* res = new char[n];
+    char temp;
+    int i = 0;
+    temp = '1';
+    
+    while (cin.get(temp) && temp != '\n')
+   {
+        if (i>= n)
+        {
+            res = resize(res,n,2*n);
+            n *= 2;
+        }
+        res[i++] = temp;
+    } ;
+    res[i] = '\0';
+    return res;
+}
+
 int main()
 {
-    int * n = new int(5);
-    cout << *n << " " << n << endl;
-    delete n;
-    n = new int[1000];
-    delete n;
-    cout << "test\n";
-    //test
+    char * line = getline();
+    cout << line << endl;
 }
