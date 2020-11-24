@@ -59,6 +59,25 @@ char *getline()
     return res;
 }
 
+
+int ** transpose(const int * const * m, unsigned rows, unsigned cols)
+{
+    int ** res = new int*[cols];
+    res[0] = new int[cols * rows];
+    for (int i = 1; i != cols; ++i)    
+    {
+        res[i] = res[i-1] + rows;
+    }
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            res[j][i] = m[i][j];
+        }
+    }
+    return res;
+}
+
 int main()
 {
     char * line = getline();
