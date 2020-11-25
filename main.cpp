@@ -118,6 +118,20 @@ void input_matrix( int *m[ ], const unsigned rows, const unsigned cols )
 }
 
 
+//not recommended
+void c_style()
+{
+    char s1[100] = "Hello";
+    cout << strlen(s1) << endl;
+
+    char s2[] = ", world!";
+    //must be careful, can damage stack
+    strcat(s1,s2);
+
+    char s3[6] = {72, 101, 108, 111};
+    if (strcmp(s1,s3) == 0)
+        cout << "s1 == s3" << endl;
+}
 
 int main()
 {
