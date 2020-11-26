@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 
-//to work with files
-#include <fstream>
+#include <fstream> //to work with files
+#include <cstddef> // size_t
+#include <cstring> //strlen, strcpy
 
 using namespace std;
-
 char *resize(const char *str, unsigned size, unsigned new_size)
 {
     char *res = new char[new_size];
@@ -42,6 +42,74 @@ char *resize3(const char *mem, unsigned size, unsigned new_size)
     delete[] mem;
     return new_mem;
 }
+
+struct String
+{
+    String(const char *str = ""){
+        if (str != 0)
+        {
+            this->size = strlen(str);
+            this->str = new char[this->size+1]; 
+            strcpy(this->str,str);
+            this->str[this->size] = '\0';
+        } 
+        else 
+        {
+            this->size = 0;
+        }
+    }
+
+    String(size_t n, char c)
+    {
+        this->str = new char[this->size+1]; 
+        for (size_t i = 0; i < n; i++)
+        {
+            this->str[i] = c;
+        }
+        this->str[n] = '\0';
+        this->size = n;
+    }
+
+    ~String(){
+        if (this->str != 0)
+        {
+            delete [] this->str;
+            this->size;
+        }
+    }
+
+
+    size_t size;
+    char  *str;
+
+    void append(String &s)
+    {
+        
+        if (s.size == 0)
+            return;
+        if (this-> size == 0) {
+            delete [] this->str;
+            this-> str = new char[s.size+1];
+            strcpy(this->str,s.str);
+            this->size = s.size;
+            return;
+        }
+        char* temp1 = new char[this->size+1];
+        char* temp2 = new char[s.size+1];
+        strcpy(temp1,this->str);
+        strcpy(temp2,s.str);
+        size_t new_length = this->size + s.size;
+        delete [] this->str;
+        this->str = new char[new_length+1];
+        strcpy(this->str, temp1);
+        strcat(this->str,temp2);
+        delete [] temp1;
+        delete [] temp2;
+        this->size = new_length;
+    }
+};
+
+
 
 char *getline()
 {
@@ -163,23 +231,49 @@ void working_with_files()
 
 int main()
 {
-    unsigned rows, columns;
-    std::cout << "Input number of rows: ";
-    std::cin >> rows;
-    std::cout << "Input number of columns: ";
-    std::cin >> columns;
-    int **matrix = new int *[rows];
-    for (size_t count = 0; count < rows; count++)
-        matrix[count] = new int[columns];
-    input_matrix(matrix, rows, columns);
-    std::cout << "\nYour matrix is... \n\n";
-    print_matrix(matrix, rows, columns);
-    std::cout << "\nChange row with first row ... \n\n";
-    swap_min(matrix, rows, columns);
-    std::cout << "Modified matrix... \n\n";
-    print_matrix(matrix, rows, columns);
-    std::cout << "\nFree memory... \n";
-    for (size_t count = 0; count < rows; count++)
-        delete[] matrix[count];
+   const size_t ntest = 10;
+    
+    std::string tests[ntest][2] = {
+                                {"", ""},
+                                {"", "test"},
+                                {"test", ""},
+                                {"test", "test"},
+                                {"Hello ", " world!"},
+                                {"Supercalifragilistic", "expialidocious"}
+                              };
+    
+    for (size_t i=0; i<ntest; ++i) {
+        String t1(tests[i][0].c_str());
+        String t2(tests[i][1].c_str());
+        
+        t1.append(t2);
+        
+        std::string res(t1.str);
+        if (res != tests[i][0]+tests[i][1]) {
+            std::cout << "Test " << i+1 << " failed!" << std::endl;
+            std::cout << "Must be " << tests[i][0]+tests[i][1] << std::endl;
+            std::cout << "But result is " << res << std::endl;
+        } else {
+            std::cout << "Test " << i+1 << " passed!" << std::endl;
+        }
+        
+    }
+    
+    
+    std::string last = "Same pointer test";
+    String t(last.c_str());
+    cout << t.str << endl;
+    t.append(t);
+    
+    std::string res(t.str);
+    cout << t.str <<endl;
+    if (res != last+last) {
+        std::cout << "Test " << ntest+1 << " failed!" << std::endl;
+        std::cout << "Must be " << last+last << std::endl;
+        std::cout << "But result is " << res << std::endl;
+    } else {
+        std::cout << "Test " << ntest+1 << " passed!" << std::endl;
+    }
+        
     return 0;
 }
