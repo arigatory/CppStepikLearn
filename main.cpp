@@ -229,51 +229,65 @@ void working_with_files()
     output << "Hi, " << name << endl;
 }
 
+
+
+// Так лучше не делать, но для понимания очень полезно!
+/*
+ * Класс Cls определен точно таким образом:
+ */
+struct Cls {
+    Cls(char c, double d, int i): c(c), d(d), i(i) {}
+    ~Cls(){}
+private:
+    char c;
+    double d;
+    int i;
+};
+
+struct ClsPubl
+{
+    ClsPubl(char _c, double _d, int _i): c(c), d(d), i(i) {}
+    ~ClsPubl(){}
+public:
+    char c;
+    double d;
+    int i;
+};
+
+
+
+// Эта функция должна предоставить доступ к полю c объекта cls.
+// Обратите внимание, что возвращается ссылка на char, т. е.
+// доступ предоставляется на чтение и запись.
+char &get_c(Cls &cls) {
+    void* voidptr = static_cast<void*>(&cls);
+    struct ClsPubl * p = static_cast<ClsPubl*>(voidptr);
+    return p->c;
+}
+
+// Эта функция должна предоставить доступ к полю d объекта cls.
+// Обратите внимание, что возвращается ссылка на double, т. е.
+// доступ предоставляется на чтение и запись.
+double &get_d(Cls &cls) {
+    void * voidptr = static_cast<void*>(&cls);
+    struct ClsPubl * p = static_cast<ClsPubl*>(voidptr);
+    return p->d;
+}
+
+// Эта функция должна предоставить доступ к полю i объекта cls.
+// Обратите внимание, что возвращается ссылка на int, т. е.
+// доступ предоставляется на чтение и запись.
+int &get_i(Cls &cls) {
+     void * voidptr = static_cast<void*>(&cls);
+    struct ClsPubl * p = static_cast<ClsPubl*>(voidptr);
+    return p->i;
+}
+
+
+
 int main()
 {
-   const size_t ntest = 10;
-    
-    std::string tests[ntest][2] = {
-                                {"", ""},
-                                {"", "test"},
-                                {"test", ""},
-                                {"test", "test"},
-                                {"Hello ", " world!"},
-                                {"Supercalifragilistic", "expialidocious"}
-                              };
-    
-    for (size_t i=0; i<ntest; ++i) {
-        String t1(tests[i][0].c_str());
-        String t2(tests[i][1].c_str());
-        
-        t1.append(t2);
-        
-        std::string res(t1.str);
-        if (res != tests[i][0]+tests[i][1]) {
-            std::cout << "Test " << i+1 << " failed!" << std::endl;
-            std::cout << "Must be " << tests[i][0]+tests[i][1] << std::endl;
-            std::cout << "But result is " << res << std::endl;
-        } else {
-            std::cout << "Test " << i+1 << " passed!" << std::endl;
-        }
-        
-    }
-    
-    
-    std::string last = "Same pointer test";
-    String t(last.c_str());
-    cout << t.str << endl;
-    t.append(t);
-    
-    std::string res(t.str);
-    cout << t.str <<endl;
-    if (res != last+last) {
-        std::cout << "Test " << ntest+1 << " failed!" << std::endl;
-        std::cout << "Must be " << last+last << std::endl;
-        std::cout << "But result is " << res << std::endl;
-    } else {
-        std::cout << "Test " << ntest+1 << " passed!" << std::endl;
-    }
-        
-    return 0;
+    Cls c = Cls(')',1.1,5);
+    cout << get_c(c) << " " << get_d(c) << " " << get_i(c) << endl; 
+
 }
