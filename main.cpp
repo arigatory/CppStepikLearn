@@ -306,14 +306,26 @@ int &get_i(Cls &cls) {
     return p->i;
 }
 
+struct Foo {
+    void say() const { std::cout << "Foo says: " << msg << "\n"; }
+protected:
+    Foo(const char *msg) : msg(msg) { }
+private:
+    const char *msg;
+};
 
+struct Foo2 : Foo {
+    Foo2(const char *msg) : Foo(msg) { }
+};
+
+void foo_says(const Foo& foo) { foo.say(); }
+
+Foo get_foo(const char *msg) {
+    return Foo(Foo2(msg));
+}
 
 int main()
 {
-    String s1 = String("Hello ");
-    String s2 = String("Wordl ");
-    cout << s1.str << s2.str << endl;
-    String s3 = String("Russia ");
-    s2 = s3;
-    cout << s1.str << s2.str << endl;
+    char msg[] = "hi";
+    foo_says(get_foo(msg));
 }
