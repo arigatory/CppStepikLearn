@@ -70,6 +70,29 @@ struct String
         this->size = n;
     }
 
+    String(const String &other) : size(other.size), str(new char[other.size+1])
+    {
+        strcpy(str,other.str);
+    }
+    void swap(String &s) {
+        size_t const t1 = size;
+        size = s.size;
+        s.size = t1;
+
+        char * const t2 = str;
+        str = s.str;
+        s.str = t2;
+    }
+
+    String & operator=(String const &other)
+    {
+        if (this != &other)
+        {
+            String(other).swap(*this);
+        }
+        return *this;
+    }
+
     ~String(){
         if (this->str != 0)
         {
@@ -287,7 +310,10 @@ int &get_i(Cls &cls) {
 
 int main()
 {
-    Cls c = Cls(')',1.1,5);
-    cout << get_c(c) << " " << get_d(c) << " " << get_i(c) << endl; 
-
+    String s1 = String("Hello ");
+    String s2 = String("Wordl ");
+    cout << s1.str << s2.str << endl;
+    String s3 = String("Russia ");
+    s2 = s3;
+    cout << s1.str << s2.str << endl;
 }
