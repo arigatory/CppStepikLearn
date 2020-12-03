@@ -324,10 +324,23 @@ Foo get_foo(const char *msg) {
     return Foo(Foo2(msg));
 }
 
+
+//START of VISITOR TASK
+
+struct Number;
+struct BinaryOperation;
+
+struct Visitor {
+    virtual void visitNumber(Number const * number) = 0;
+    virtual void visitBinaryOperation(BinaryOperation const * operation) = 0;
+    virtual ~Visitor() { }
+};
+
 struct Expression
 {
     virtual double evaluate() const = 0;
-    virtual ~Expression(){};
+    virtual void visit(Visitor * vistitor) const = 0;
+    virtual ~Expression() { }
 };
 
 struct Number : Expression
@@ -339,19 +352,24 @@ struct Number : Expression
     {
         return this->value;
     }
+
+    double get_value() const { return value; }
+
+    void visit(Visitor * visitor) const { visitor->visitNumber(this); }
+
 private:
     double value;
 };
 
 struct BinaryOperation : Expression
 {
-    /*
-      Здесь op это один из 4 символов: '+', '-', '*' или '/', соответствующих операциям,
-      которые вам нужно реализовать.
-     */
     BinaryOperation(Expression const * left, char op, Expression const * right)
         : left(left), op(op), right(right)
     { }
+    virtual ~BinaryOperation(){
+        delete left;
+        delete right;
+    }
     double evaluate() const 
     {
         if (op == '+') {
@@ -365,17 +383,36 @@ struct BinaryOperation : Expression
         } 
         return 0;
     }
-    virtual ~BinaryOperation(){
-        delete left;
-        delete right;
-    }
+
+    Expression const * get_left() const { return left; }
+    Expression const * get_right() const { return right; }
+    char get_op() const { return op; }
+
+    void visit(Visitor * visitor) const { visitor->visitBinaryOperation(this); }
+
 private:
     Expression const * left;
     Expression const * right;
     char op;
 };
 
+//END
 
+struct PrintVisitor : Visitor {
+    void visitNumber(Number const * number)
+    {
+        cout << number->get_value();
+    }
+
+    void visitBinaryOperation(BinaryOperation const * bop)
+    {
+        cout << "(";
+        bop->get_left()->visit(this);
+        cout << ")" << bop->get_op() << "(";
+        bop->get_right()->visit(this);
+        cout << ")";
+    }
+};
 
 int main()
 {
@@ -386,7 +423,8 @@ Expression * expr = new BinaryOperation(new Number(3), '+', sube);
 
 // вычисляем и выводим результат: 25.5
 std::cout << expr->evaluate() << std::endl;
-
+PrintVisitor visitor;
+expr->visit(&visitor);
 // тут освобождаются *все* выделенные объекты
 // (например, sube будет правым операндом expr, поэтому его удалять не нужно)
 delete expr;
