@@ -414,18 +414,90 @@ struct PrintVisitor : Visitor {
     }
 };
 
+struct Rational
+{
+    Rational(int numerator = 0, int denominator = 1) :
+        numerator_(numerator), denominator_(denominator) {};
+
+    void add(Rational rational) {
+        numerator_ = numerator_ * rational.denominator_ + rational.numerator_*denominator_;
+        denominator_ *= rational.denominator_;
+    }
+    void sub(Rational rational){
+        numerator_ = numerator_ * rational.denominator_ - rational.numerator_*denominator_;
+        denominator_ *= rational.denominator_;
+    }
+    void mul(Rational rational) {
+        numerator_ *= rational.numerator_;
+        denominator_ *= rational.denominator_;
+    }
+    void div(Rational rational){
+        numerator_ /= rational.numerator_;
+        denominator_ /= rational.denominator_;
+    }
+
+    Rational operator-() const {return Rational(-numerator_,denominator_); }
+    Rational operator+() const {return Rational(numerator_,denominator_); }
+
+
+
+    void neg() {
+        numerator_ = -numerator_;
+    }
+    void inv(){}
+
+    double to_double() {
+        return numerator_/(double) denominator_;
+    }
+
+    Rational & operator+=(Rational const& r) {
+        add(r);
+        return *this;
+    }
+
+    Rational & operator-=(Rational const& r) {
+        sub(r);
+        return *this;
+    }
+
+    Rational & operator*=(Rational const& r) {
+        mul(r);
+        return *this;
+    }
+
+    Rational & operator/=(Rational const& r) {
+        div(r);
+        return *this;
+    }
+
+private:
+    int numerator_;
+    int denominator_;
+};
+
+Rational operator+(Rational r1, Rational r2) {
+    return r1 += r2;
+}
+
+Rational operator-(Rational r1, Rational r2) {
+    return r1 -= r2;
+}
+
+Rational operator*(Rational r1, Rational r2) {
+    return r1 *= r2;
+}
+
+Rational operator/(Rational r1, Rational r2) {
+    return r1 /= r2;
+}
+
+
 int main()
 {
-    // сначала создаём объекты для подвыражения 4.5 * 5
-Expression * sube = new BinaryOperation(new Number(4.5), '*', new Number(5));
-// потом используем его в выражении для +
-Expression * expr = new BinaryOperation(new Number(3), '+', sube);
+    Rational r1(1,2);
+    Rational r2(1,3);
+    Rational r3(5);
 
-// вычисляем и выводим результат: 25.5
-std::cout << expr->evaluate() << std::endl;
-PrintVisitor visitor;
-expr->visit(&visitor);
-// тут освобождаются *все* выделенные объекты
-// (например, sube будет правым операндом expr, поэтому его удалять не нужно)
-delete expr;
+    r1.add(r2);
+    cout << (-r1).to_double() << endl;
 }
