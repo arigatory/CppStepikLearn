@@ -470,10 +470,40 @@ struct Rational
         return *this;
     }
 
-private:
+    friend bool operator==(Rational const& left, Rational const &right){
+        return left.numerator_*right.denominator_==left.denominator_*right.numerator_;
+    }
+    
+    friend bool operator<(Rational const& left, Rational const &right){
+        if (left.numerator_*left.denominator_>=0)
+            if (right.denominator_*right.numerator_>=0)
+                return left.numerator_*right.denominator_<left.denominator_*right.numerator_;
+            else
+                return false;
+        else
+            if (right.denominator_*right.numerator_<=0)
+                return left.numerator_*right.denominator_>left.denominator_*right.numerator_;
+            else
+                return true;
+    }
+
+    private:
     int numerator_;
     int denominator_;
 };
+
+bool operator<=(Rational const& left, Rational const &right){
+        return !(right<left);
+}
+bool operator>(Rational const& left, Rational const &right){
+        return right<left;
+}
+bool operator!=(Rational const& left, Rational const &right){
+        return !(right==left);
+}
+bool operator>=(Rational const& left, Rational const &right){
+        return !(left<right);
+}
 
 Rational operator+(Rational r1, Rational r2) {
     return r1 += r2;
@@ -494,10 +524,13 @@ Rational operator/(Rational r1, Rational r2) {
 
 int main()
 {
-    Rational r1(1,2);
-    Rational r2(1,3);
-    Rational r3(5);
+    Rational r1(2,3);
+    Rational r2(10,15);
 
-    r1.add(r2);
-    cout << (-r1).to_double() << endl;
+    cout << (r1==r2) << endl;
+    cout << (r1<r2) << endl;
+    cout << (r1<=r2) << endl;
+    cout << (r1>=r2) << endl;
+    cout << (r1>r2) << endl;
+    cout << (r1!=r2) << endl;
 }
