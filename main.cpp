@@ -616,7 +616,7 @@ struct SharedPtr {
 
     explicit SharedPtr(Expression *ptr = 0): ptr_(ptr), counter_(0)
     {
-        if (ptr) inc();
+        inc();
     }
     
     ~SharedPtr(){
@@ -632,6 +632,7 @@ struct SharedPtr {
         {
             dec();
             ptr_ = sp.ptr_;
+            counter_ = sp.counter_;
             inc();
         }
         return *this;
@@ -656,8 +657,15 @@ struct SharedPtr {
 private:
     size_t * counter_;
     Expression *ptr_;
-    void inc() { if (counter_) ++*counter_; 
-                    else { if (ptr_) counter_ = new size_t(1); }}
+    void inc() { 
+        if (counter_) {
+            ++*counter_; 
+        } else { 
+            if (ptr_) 
+                counter_ = new size_t(1); 
+        }
+    }
+
     void dec() { 
         if (counter_ && --*counter_==0) {
             if (ptr_)
