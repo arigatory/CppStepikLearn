@@ -563,6 +563,53 @@ Rational operator/(Rational r1, Rational r2) {
     return r1 /= r2;
 }
 
+struct ScopedPtr
+{
+    // реализуйте следующие методы:
+    //
+    explicit ScopedPtr(Expression *ptr = 0) {
+        ptr_ = ptr;
+    }
+    ~ScopedPtr() {
+        delete ptr_;
+        ptr_ = nullptr;
+    }
+    Expression* get() const {
+        if (ptr_)
+            return ptr_;
+        else
+        {
+            return nullptr;
+        }
+        
+    }
+     Expression* release() {
+         Expression * res = ptr_;
+         ptr_ = nullptr;
+         return res;
+    }
+    void reset(Expression *ptr = 0) {
+        if (ptr != ptr_)
+		{
+			delete ptr_;
+			ptr_ = ptr;
+		}
+    }
+    Expression& operator*() const {
+        return *ptr_;
+    }
+    Expression* operator->() const {
+        return ptr_;
+    }
+
+
+private:
+    // запрещаем копирование ScopedPtr
+    ScopedPtr(const ScopedPtr&);
+    ScopedPtr& operator=(const ScopedPtr&);
+
+    Expression *ptr_;
+};
 
 int main()
 {
