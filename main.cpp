@@ -93,6 +93,48 @@ struct String
         return *this;
     }
 
+    struct Proxy
+    {
+        Proxy(size_t n, const char *str = ""){
+            start_i = n;
+            if (str != 0)
+            {
+                this->size = strlen(str);
+                this->str = new char[this->size+1]; 
+                strcpy(this->str,str);
+                this->str[this->size] = '\0';
+            } 
+            else 
+            {
+                this->size = 0;
+            }
+        }
+        ~Proxy()
+        {
+            if (this->str != 0)
+            {
+                delete [] this->str;
+                this->size;
+            }
+
+        }
+
+        String operator[](size_t i) {
+            size_t s = i-start_i;
+            String res(s,' ');
+            strncpy(res.str,this->str,s);
+            return res;
+        }
+        size_t size;
+        size_t start_i;
+        char *str;
+    };
+    
+    
+    Proxy operator[](size_t i) const {
+        return Proxy(i,str+i);
+    }
+
     ~String(){
         if (this->str != 0)
         {
@@ -524,13 +566,9 @@ Rational operator/(Rational r1, Rational r2) {
 
 int main()
 {
-    Rational r1(2,3);
-    Rational r2(10,15);
-
-    cout << (r1==r2) << endl;
-    cout << (r1<r2) << endl;
-    cout << (r1<=r2) << endl;
-    cout << (r1>=r2) << endl;
-    cout << (r1>r2) << endl;
-    cout << (r1!=r2) << endl;
+    String const hello("hello");
+    String const hell = hello[0][4]; // теперь в hell хранится подстрока "hell"
+    String const ell  = hello[1][4]; // теперь в ell хранится подстрока "ell"
+    cout << hell.str << endl;
+    cout << ell.str << endl;
 }
