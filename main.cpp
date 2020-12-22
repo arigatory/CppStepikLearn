@@ -4,7 +4,7 @@
 #include <fstream> //to work with files
 #include <cstddef> // size_t
 #include <cstring> //strlen, strcpy
-#include <crtdbg.h>
+
 
 using namespace std;
 char *resize(const char *str, unsigned size, unsigned new_size)
@@ -703,8 +703,5 @@ int main()
         p8.reset(NULL);
     }
     p1 = p1;
-    if(_CrtDumpMemoryLeaks())
-        std::cout<<"memory leak is detected"<<std::endl;
-    else
-        std::cout<<"no memory leaks"<<std::endl;
+
 }
