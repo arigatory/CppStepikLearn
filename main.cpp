@@ -4,6 +4,7 @@
 #include <fstream> //to work with files
 #include <cstddef> // size_t
 #include <cstring> //strlen, strcpy
+#include <crtdbg.h>
 
 using namespace std;
 char *resize(const char *str, unsigned size, unsigned new_size)
@@ -91,6 +92,48 @@ struct String
             String(other).swap(*this);
         }
         return *this;
+    }
+
+    struct Proxy
+    {
+        Proxy(size_t n, const char *str = ""){
+            start_i = n;
+            if (str != 0)
+            {
+                this->size = strlen(str);
+                this->str = new char[this->size+1]; 
+                strcpy(this->str,str);
+                this->str[this->size] = '\0';
+            } 
+            else 
+            {
+                this->size = 0;
+            }
+        }
+        ~Proxy()
+        {
+            if (this->str != 0)
+            {
+                delete [] this->str;
+                this->size;
+            }
+
+        }
+
+        String operator[](size_t i) {
+            size_t s = i-start_i;
+            String res(s,' ');
+            strncpy(res.str,this->str,s);
+            return res;
+        }
+        size_t size;
+        size_t start_i;
+        char *str;
+    };
+    
+    
+    Proxy operator[](size_t i) const {
+        return Proxy(i,str+i);
     }
 
     ~String(){
@@ -569,15 +612,99 @@ private:
     Expression *ptr_;
 };
 
+struct SharedPtr {
+
+    explicit SharedPtr(Expression *ptr = 0): ptr_(ptr), counter_(0)
+    {
+        inc();
+    }
+    
+    ~SharedPtr(){
+        dec();
+    }
+    
+    SharedPtr(const SharedPtr & sp): ptr_(sp.ptr_), counter_(sp.counter_) {
+        inc();
+    }
+    
+     SharedPtr& operator=(const SharedPtr & sp) {
+        if (this != &sp)
+        {
+            dec();
+            ptr_ = sp.ptr_;
+            counter_ = sp.counter_;
+            inc();
+        }
+        return *this;
+    }
+    
+    Expression* get() const { 
+        return ptr_;
+    }
+    
+    void reset(Expression *ptr = 0) {
+        dec();
+        ptr_ = ptr;
+        inc();
+    }
+    
+    Expression& operator*() const {
+        return *ptr_;
+    }
+    Expression* operator->() const {
+        return ptr_;
+    }
+private:
+    size_t * counter_;
+    Expression *ptr_;
+    void inc() { 
+        if (counter_) {
+            ++*counter_; 
+        } else { 
+            if (ptr_) 
+                counter_ = new size_t(1); 
+        }
+    }
+
+    void dec() { 
+        if (counter_ && --*counter_==0) {
+            if (ptr_)
+            {
+                delete ptr_;
+                ptr_ = nullptr;
+            }
+            delete counter_;
+            counter_ = nullptr;
+        }
+    }
+};
+
+
 int main()
 {
-    Rational r1(2,3);
-    Rational r2(10,15);
-
-    cout << (r1==r2) << endl;
-    cout << (r1<r2) << endl;
-    cout << (r1<=r2) << endl;
-    cout << (r1>=r2) << endl;
-    cout << (r1>r2) << endl;
-    cout << (r1!=r2) << endl;
+    SharedPtr p1;
+    {
+        SharedPtr p2(new Number(1));
+        SharedPtr p3(new Number(2));
+        SharedPtr p4(p2);
+        SharedPtr p5;
+        p5 = p2;
+        p5 = p4;
+        p1 = p5;
+        p3.reset(NULL);
+        p3 = p5;
+        p5.reset(NULL);
+        SharedPtr p6;
+        SharedPtr p7;
+        p7 = p7;
+        p7.reset(NULL);
+        p7.reset(new Number(3));
+        SharedPtr p8(new Number(4));
+        p8.reset(NULL);
+    }
+    p1 = p1;
+    if(_CrtDumpMemoryLeaks())
+        std::cout<<"memory leak is detected"<<std::endl;
+    else
+        std::cout<<"no memory leaks"<<std::endl;
 }
